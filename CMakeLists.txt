@@ -5,37 +5,37 @@ cmake_minimum_required(VERSION 3.10.0)
 # SHADER COMPILATION
 #####################
 
-find_program(SLANGC slangc REQUIRED)
-
-set(SHADER_SOURCES_DIR ${CMAKE_SOURCE_DIR}/ressources/shaders)
-set(SHADER_SOURCES
-	${SHADER_SOURCES_DIR}/default.vert.slang
-	${SHADER_SOURCES_DIR}/grid.vert.slang
-	${SHADER_SOURCES_DIR}/face_color.frag.slang
-	${SHADER_SOURCES_DIR}/grid.frag.slang
-
-)
-
-set(SHADER_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/ressources/compiled_shaders)
-set(SHADER_SPV_FILES)
-
-foreach(SHADER ${SHADER_SOURCES})
-	get_filename_component(FILE_NAME ${SHADER} NAME)
-	set(SPV ${SHADER_OUTPUT_DIR}/${FILE_NAME}.spv)
-
-	list(APPEND SHADER_SPV_FILES ${SPV})
-
-	add_custom_command(
-		OUTPUT ${SPV}
-		COMMAND ${CMAKE_COMMAND} -E make_directory ${SHADER_OUTPUT_DIR}
-		# COMMAND slangc ${SHADER} -lang slang -target spirv -profile glsl_450 -emit-spirv-directly -fvk-use-entrypoint-name -fvk-use-gl-layout ${ENTRY_POINTS} -o ${SPV}
-		COMMAND slangc ${SHADER} -lang slang -target spirv -profile glsl_450 -emit-spirv-directly -fvk-use-gl-layout -o ${SPV}
-		DEPENDS ${SHADER}
-		VERBATIM
-	)
-endforeach()
-
-add_custom_target(shaders DEPENDS ${SHADER_SPV_FILES})
+# find_program(SLANGC slangc REQUIRED)
+#
+# set(SHADER_SOURCES_DIR ${CMAKE_SOURCE_DIR}/ressources/shaders)
+# set(SHADER_SOURCES
+# 	${SHADER_SOURCES_DIR}/default.vert.slang
+# 	${SHADER_SOURCES_DIR}/grid.vert.slang
+# 	${SHADER_SOURCES_DIR}/face_color.frag.slang
+# 	${SHADER_SOURCES_DIR}/grid.frag.slang
+#
+# )
+#
+# set(SHADER_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/ressources/compiled_shaders)
+# set(SHADER_SPV_FILES)
+#
+# foreach(SHADER ${SHADER_SOURCES})
+# 	get_filename_component(FILE_NAME ${SHADER} NAME)
+# 	set(SPV ${SHADER_OUTPUT_DIR}/${FILE_NAME}.spv)
+#
+# 	list(APPEND SHADER_SPV_FILES ${SPV})
+#
+# 	add_custom_command(
+# 		OUTPUT ${SPV}
+# 		COMMAND ${CMAKE_COMMAND} -E make_directory ${SHADER_OUTPUT_DIR}
+# 		# COMMAND slangc ${SHADER} -lang slang -target spirv -profile glsl_450 -emit-spirv-directly -fvk-use-entrypoint-name -fvk-use-gl-layout ${ENTRY_POINTS} -o ${SPV}
+# 		COMMAND slangc ${SHADER} -lang slang -target spirv -profile glsl_450 -emit-spirv-directly -fvk-use-gl-layout -o ${SPV}
+# 		DEPENDS ${SHADER}
+# 		VERBATIM
+# 	)
+# endforeach()
+#
+# add_custom_target(shaders DEPENDS ${SHADER_SPV_FILES})
 
 ##############
 # PROJECT
@@ -61,6 +61,7 @@ endif()
 
 
 add_subdirectory(external/Vulkan-Headers)
+add_subdirectory(external/VMA)
 # add_subdirectory(external/glm)
 
 # to reduce compile by not bulding unescessary stuff
