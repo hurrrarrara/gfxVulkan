@@ -1,0 +1,27 @@
+{
+	"version": 3,
+	"configurePresets": [
+		{
+		  "name": "debug",
+		  "binaryDir": "${sourceDir}/build/${presetName}",
+		  "cacheVariables": {
+			"CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+			"CMAKE_C_COMPILER": "clang",
+			"CMAKE_CXX_COMPILER": "clang++",
+			"CMAKE_BUILD_TYPE": "Debug",
+			"CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+			"CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/bin",
+			"CMAKE_CXX_FLAGS": "-Wall -Wextra -Werror -Wpedantic -Wdeprecated -Werror=deprecated -Werror=deprecated-declarations -Wno-gnu-anonymous-struct -Wno-nested-anon-types -g "
+		  }
+		}
+	],
+	"buildPresets": [
+		{
+			"name": "debug",
+			"configurePreset": "debug",
+			"jobs": 0,
+			"verbose": false
+		}
+	]
+}
+
