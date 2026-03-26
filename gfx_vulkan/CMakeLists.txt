@@ -5,13 +5,15 @@ set(LIBRARY_NAME gfx_vulkan)
 set(LIBRARY_HEADERS_DIR include/${LIBRARY_NAME})
 set(LIBRARY_HEADERS 
 	${LIBRARY_HEADERS_DIR}/Device.h
-	${LIBRARY_HEADERS_DIR}/BufferPool.h
+	${LIBRARY_HEADERS_DIR}/ResourcesManager.h
+	${LIBRARY_HEADERS_DIR}/details/Archetypes.h
 	${LIBRARY_HEADERS_DIR}/details/prerequisites.h
 	${LIBRARY_HEADERS_DIR}/details/log.h
 )
 set(LIBRARY_SOURCE_DIR src)
 set(LIBRARY_SOURCE 
 	${LIBRARY_SOURCE_DIR}/Device.cpp
+	${LIBRARY_SOURCE_DIR}/ResourcesManager.cpp
 	${LIBRARY_SOURCE_DIR}/utils.h
 	${LIBRARY_SOURCE_DIR}/init/instance.cpp
 	${LIBRARY_SOURCE_DIR}/init/physical_device.cpp
@@ -44,4 +46,5 @@ target_include_directories(${LIBRARY_NAME}
 target_link_libraries(${LIBRARY_NAME} PUBLIC 
 	Vulkan::Headers
 	GPUOpen::VulkanMemoryAllocator
+	ecs
 )

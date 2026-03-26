@@ -4,6 +4,24 @@
 #define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
 #include <vulkan/vulkan.hpp>
 
+#ifdef __clang__
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wnullability-extension"
+  #pragma clang diagnostic ignored "-Wnullability-completeness"
+  #pragma clang diagnostic ignored "-Wpedantic"
+  #pragma clang diagnostic ignored "-Wmissing-field-initializers"
+  #pragma clang diagnostic ignored "-Wunused-parameter"
+  #pragma clang diagnostic ignored "-Wall"
+#endif
+
+#define VMA_STATIC_VULKAN_FUNCTIONS 0
+#define VMA_DYNAMIC_VULKAN_FUNCTIONS 1
+#include "vk_mem_alloc.h"
+
+#ifdef __clang__
+  #pragma clang diagnostic pop
+#endif
+
 
 namespace gfx {
 

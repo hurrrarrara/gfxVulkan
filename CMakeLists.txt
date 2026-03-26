@@ -62,6 +62,7 @@ endif()
 
 add_subdirectory(external/Vulkan-Headers)
 add_subdirectory(external/VMA)
+
 # add_subdirectory(external/glm)
 
 # to reduce compile by not bulding unescessary stuff
@@ -73,7 +74,7 @@ add_subdirectory(external/glfw)
 
 add_subdirectory(gfx_vulkan)
 add_subdirectory(window)
-# add_subdirectory(gfx_ecs)
+add_subdirectory(lib/ecs)
 
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp)
@@ -98,8 +99,10 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
 set(EXAMPLES_DIR ${CMAKE_SOURCE_DIR}/examples)
 set(EXAMPLES_SOURCES
-	${EXAMPLES_DIR}/window_creation.cpp
-	${EXAMPLES_DIR}/device_creation.cpp
+	${EXAMPLES_DIR}/ex_window_creation.cpp
+	${EXAMPLES_DIR}/ex_device_creation.cpp
+	# ${EXAMPLES_DIR}/ex_archetypes.cpp
+	${EXAMPLES_DIR}/ex_resources_manager.cpp
 
 )
 foreach(SOURCE ${EXAMPLES_SOURCES})
