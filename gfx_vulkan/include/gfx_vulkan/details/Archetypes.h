@@ -84,6 +84,14 @@ public:
 		return _sparse.size() >= e && _sparse[e] != ecs::INVALID_ENTITY;
 	}
 
+	void clear() {
+		std::apply([](auto&... set){
+				((set.resize(0)), ...);
+		}, _sets);
+		_dense.resize(0);
+		_sparse.resize(_sparse.size(), ecs::INVALID_ENTITY);
+	};
+
 private:
 	std::tuple<std::vector<Components>...> _sets;
 	std::vector<ecs::Entity> _dense;
