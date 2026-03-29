@@ -149,15 +149,15 @@ IfMacros:
 IncludeBlocks:   Preserve
 IncludeCategories:
   - Regex:           '^"(llvm|llvm-c|clang|clang-c)/'
-    Priority:        2
+    Priority:        0
     SortPriority:    0
     CaseSensitive:   false
   - Regex:           '^(<|"(gtest|gmock|isl|json)/)'
-    Priority:        3
+    Priority:        0
     SortPriority:    0
     CaseSensitive:   false
   - Regex:           '.*'
-    Priority:        1
+    Priority:        0
     SortPriority:    0
     CaseSensitive:   false
 IncludeIsMainRegex: '(Test)?$'
@@ -230,7 +230,7 @@ SeparateDefinitionBlocks: Leave
 ShortNamespaceLines: 1
 SkipMacroDefinitionBody: false
 SortIncludes:
-  Enabled:         true
+  Enabled:         false
   IgnoreCase:      false
 SortJavaStaticImport: Before
 SortUsingDeclarations: LexicographicNumeric

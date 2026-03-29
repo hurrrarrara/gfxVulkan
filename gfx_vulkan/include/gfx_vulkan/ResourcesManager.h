@@ -10,6 +10,7 @@
 
 namespace gfx {
 
+/* clang-format off */
 struct BufferHandle {vk::Buffer value;};
 struct BufferAddress {vk::DeviceAddress value;};
 struct BufferMapped {void* value;};
@@ -42,51 +43,54 @@ typedef ecs::Entity PipelineHandle;
 typedef ecs::Entity PipelineLayoutHandle;
 
 typedef gfx::details::Archetype<BufferHandle, BufferAddress, BufferMapped, BufferOffset, BufferSize, BufferMemory, BufferAllocation> BufferArchetype;
-
+/* clang-format on */
 
 class ResourcesManager {
 public:
-	ResourcesManager(Device& device);
-	~ResourcesManager();
-	void flush();
+    ResourcesManager(Device& device);
+    ~ResourcesManager();
+    void flush();
 
-	[[nodiscard]]
-	GpuBufferHandle createBuffer(std::string name, vk::BufferCreateInfo bufferInfo, VmaMemoryUsage memoryUsage = VMA_MEMORY_USAGE_AUTO);
-	void destroyBuffer(GpuBufferHandle handle);
-	void destroyBuffer(std::string name);
-	[[nodiscard]]
-	GpuBufferHandle getBufferHandle(std::string name) { 
-		return (_GpuBufferHandleRegistry.find(name) != _GpuBufferHandleRegistry.end() ? _GpuBufferHandleRegistry[name] : ecs::INVALID_ENTITY);}
+    [[nodiscard]]
+    GpuBufferHandle createBuffer(std::string name, vk::BufferCreateInfo bufferInfo, VmaMemoryUsage memoryUsage = VMA_MEMORY_USAGE_AUTO);
+    void destroyBuffer(GpuBufferHandle handle);
+    void destroyBuffer(std::string name);
+    [[nodiscard]]
+    GpuBufferHandle getBufferHandle(std::string name)
+    {
+        return (_GpuBufferHandleRegistry.find(name) != _GpuBufferHandleRegistry.end() ? _GpuBufferHandleRegistry[name] : ecs::INVALID_ENTITY);
+    }
 
-	[[nodiscard]]
-	PipelineLayoutHandle createPipelineLayout(std::string name, PipelineLayoutInfo& info);
-	void destroyPipelineLayout(PipelineLayoutHandle handle);
-	void destroyPipelineLayout(std::string name);
-	[[nodiscard]]
-	PipelineLayoutHandle getPipelineHandle(std::string name) { 
-		return (_PipelineLayoutHandleRegistry.find(name) != _PipelineLayoutHandleRegistry.end() ? _PipelineLayoutHandleRegistry[name] : ecs::INVALID_ENTITY);}
-
+    [[nodiscard]]
+    PipelineLayoutHandle createPipelineLayout(std::string name, PipelineLayoutInfo& info);
+    void destroyPipelineLayout(PipelineLayoutHandle handle);
+    void destroyPipelineLayout(std::string name);
+    [[nodiscard]]
+    PipelineLayoutHandle getPipelineHandle(std::string name)
+    {
+        return (_PipelineLayoutHandleRegistry.find(name) != _PipelineLayoutHandleRegistry.end() ? _PipelineLayoutHandleRegistry[name] : ecs::INVALID_ENTITY);
+    }
 
 private:
-	vk::Device& _vkDevice;
-	VmaAllocator _allocator;
+    vk::Device& _vkDevice;
+    VmaAllocator _allocator;
 
-	BufferArchetype _buffers;
-	std::vector<std::pair<BufferHandle, BufferAllocation>> _deletedBuffers;
-	std::unordered_map<std::string, GpuBufferHandle> _GpuBufferHandleRegistry;
-	std::unordered_map<GpuBufferHandle, std::string> _invGpuBufferHandleRegistry;
-	GpuBufferHandle _GpuBufferHandleCount = 0;
+    BufferArchetype _buffers;
+    std::vector<std::pair<BufferHandle, BufferAllocation>> _deletedBuffers;
+    std::unordered_map<std::string, GpuBufferHandle> _GpuBufferHandleRegistry;
+    std::unordered_map<GpuBufferHandle, std::string> _invGpuBufferHandleRegistry;
+    GpuBufferHandle _GpuBufferHandleCount = 0;
 
-	ecs::SSet<vk::PipelineLayout> _piplineLayouts;
-	std::vector<vk::PipelineLayout> _deletedPipelineLayouts;
-	std::unordered_map<std::string, PipelineLayoutHandle> _PipelineLayoutHandleRegistry;
-	std::unordered_map<PipelineLayoutHandle, std::string> _invPipelineLayoutHandleRegistry;
-	PipelineLayoutHandle _PipelineLayoutHandleCount = 0;
+    ecs::SSet<vk::PipelineLayout> _piplineLayouts;
+    std::vector<vk::PipelineLayout> _deletedPipelineLayouts;
+    std::unordered_map<std::string, PipelineLayoutHandle> _PipelineLayoutHandleRegistry;
+    std::unordered_map<PipelineLayoutHandle, std::string> _invPipelineLayoutHandleRegistry;
+    PipelineLayoutHandle _PipelineLayoutHandleCount = 0;
 
-	gfx::details::Archetype<vk::Pipeline, PipelineLayoutHandle> _pipelines;
-	std::vector<vk::Pipeline> _deletedPipelines;
-	std::unordered_map<std::string, PipelineHandle> _PipelineHandleRegistry;
-	std::unordered_map<PipelineHandle, std::string> _invPipelineHandleRegistry;
-	PipelineHandle _PipelineHandleCount = 0;
+    gfx::details::Archetype<vk::Pipeline, PipelineLayoutHandle> _pipelines;
+    std::vector<vk::Pipeline> _deletedPipelines;
+    std::unordered_map<std::string, PipelineHandle> _PipelineHandleRegistry;
+    std::unordered_map<PipelineHandle, std::string> _invPipelineHandleRegistry;
+    PipelineHandle _PipelineHandleCount = 0;
 };
 }
