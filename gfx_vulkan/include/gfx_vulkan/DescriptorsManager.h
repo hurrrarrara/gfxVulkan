@@ -15,6 +15,14 @@ public:
 
     [[nodiscard]]
     UniformBufferDescriptor createUniformBufferDescriptor(vk::Buffer buffer);
+    [[nodiscard]]
+    StorageBufferDescriptor createStorageBufferDescriptor(vk::Buffer buffer);
+    [[nodiscard]]
+    SamplerDescriptor createSamplerDescriptor(vk::Sampler sampler);
+    [[nodiscard]]
+    SampledImageDescriptor createSampledImageDescriptor(vk::ImageView imageView);
+    [[nodiscard]]
+    StorageImageDescriptor createStorageImageDescriptor(vk::ImageView imageView);
 
     template <ecs::Entity E>
     void free(E handle)
