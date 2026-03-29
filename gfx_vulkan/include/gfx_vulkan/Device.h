@@ -19,8 +19,8 @@ public:
     template <VulkanWindow Window>
     Device(Window& window)
     {
-        auto windowExtensios = window.getRequiredExtensions();
-        for (auto& e : windowExtensios)
+        auto windowExtensions = window.getRequiredExtensions();
+        for (auto& e : windowExtensions)
             _RequiredInstanceExtensions.push_back(e);
         createInstance();
         VkInstance vkInstance = _Instance;
@@ -42,12 +42,21 @@ public:
         // mDeletionQueue = DeletionQueue(mVkDevice);
     }
 
-	[[nodiscard]]
-	vk::Instance instance() const {return _Instance;};
-	[[nodiscard]]
-	vk::PhysicalDevice physicalDevice() const {return _PhysicalDevice;};
-	[[nodiscard]]
-	vk::Device& device() {return _Device;};
+    [[nodiscard]]
+    vk::Instance instance() const
+    {
+        return _Instance;
+    };
+    [[nodiscard]]
+    vk::PhysicalDevice physicalDevice() const
+    {
+        return _PhysicalDevice;
+    };
+    [[nodiscard]]
+    vk::Device& device()
+    {
+        return _Device;
+    };
 
 private:
     void createInstance();

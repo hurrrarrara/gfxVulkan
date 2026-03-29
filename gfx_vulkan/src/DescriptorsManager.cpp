@@ -2,8 +2,9 @@
 
 namespace gfx {
 
-DescriptorsManager::DescriptorsManager(Device& device)
+GpuDescriptorsManager::GpuDescriptorsManager(Device& device, GpuDescriptorRegistry& descriptorsRegistry)
     : _vkDevice(device.device())
+    , _descriptorsRegistry(descriptorsRegistry)
 {
     std::vector<vk::DescriptorSetLayoutBinding> bindings;
     std::vector<vk::DescriptorBindingFlags> flags;
@@ -47,12 +48,31 @@ DescriptorsManager::DescriptorsManager(Device& device)
     _descriptorSet = _vkDevice.allocateDescriptorSets(setAllocateInfo).front();
 }
 
-[[nodiscard]]
-UniformBufferDescriptorHandle DescriptorsManager::createUniformBufferDescriptor(ecs::Entity entity, vk::Buffer buffer)
+GpuDescriptorsManager::~GpuDescriptorsManager()
 {
-    assert(_availableUniformDescriptorHandles.size() > 0);
+}
 
-    _
+[[nodiscard]]
+UniformBufferDescriptor GpuDescriptorsManager::createUniformBufferDescriptor(vk::Buffer buffer)
+{
+    vk::DescriptorBufferInfo bufferInfo {};
+    bufferInfo.setBuffer(buffer)
+        .setOffset(0)
+        .setRange(vk::WholeSize);
+
+    UniformBufferDescriptor handle = _descriptorsRegistry.uniformBuffers.allocate();
+
+    vk::WriteDescriptorSet write {};
+    write.setDstSet(_descriptorSet)
+        .setDescriptorCount(1)
+        .setDescriptorType(vk::DescriptorType::eUniformBuffer)
+        .setDstArrayElement(handle.index)
+        .setDstBinding(handle.binding())
+        .setBufferInfo(bufferInfo);
+
+    _vkDevice.updateDescriptorSets(1, &write, 0, nullptr);
+
+    return handle;
 }
 
 }

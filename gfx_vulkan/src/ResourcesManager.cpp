@@ -3,8 +3,9 @@
 
 namespace gfx {
 
-ResourcesManager::ResourcesManager(Device& device)
+GpuResourcesManager::GpuResourcesManager(Device& device, GpuResourcesRegistry& resourcesRegistry)
     : _vkDevice(device.device())
+    , _resourcesRegistry(resourcesRegistry)
 {
     VmaVulkanFunctions vulkanFunctions = {};
     vulkanFunctions.vkGetInstanceProcAddr = VULKAN_HPP_DEFAULT_DISPATCHER.vkGetInstanceProcAddr;
@@ -21,24 +22,27 @@ ResourcesManager::ResourcesManager(Device& device)
     vmaCreateAllocator(&allocatorCreateInfo, &_allocator);
 }
 
-ResourcesManager::~ResourcesManager()
+GpuResourcesManager::~GpuResourcesManager()
 {
     vmaDestroyAllocator(_allocator);
     flush();
 }
 
-void ResourcesManager::flush()
+void GpuResourcesManager::flush()
 {
     for (uint32_t i = 0; i < _deletedBuffers.size(); i++) {
         vmaDestroyBuffer(_allocator, _deletedBuffers[i].first.value, _deletedBuffers[i].second.value);
     }
+    for (uint32_t i = 0; i < _deletedPipelineLayouts.size(); i++) {
+        _vkDevice.destroyPipelineLayout(_deletedPipelineLayouts[i]);
+    }
     _deletedBuffers.clear();
+    _deletedPipelineLayouts.clear();
 }
 
 [[nodiscard]]
-GpuBufferHandle ResourcesManager::createBuffer(std::string name, vk::BufferCreateInfo bufferInfo, VmaMemoryUsage memoryUsage)
+BufferHandle GpuResourcesManager::createBuffer(vk::BufferCreateInfo bufferInfo, VmaMemoryUsage memoryUsage)
 {
-    assert(_GpuBufferHandleRegistry.find(name) == _GpuBufferHandleRegistry.end());
     VmaAllocationCreateInfo allocationCreateInfo = {};
     allocationCreateInfo.usage = memoryUsage;
 
@@ -49,8 +53,7 @@ GpuBufferHandle ResourcesManager::createBuffer(std::string name, vk::BufferCreat
     if (vmaCreateBuffer(_allocator, &*bufferInfo, &allocationCreateInfo, &buffer, &allocation, &allocationInfo))
         throw std::runtime_error("failed to create buffer");
 
-    GpuBufferHandle handle = _GpuBufferHandleCount;
-    _GpuBufferHandleCount++;
+    BufferHandle handle = _bufferHandleRegistry.allocate();
 
     vk::DeviceAddress address = 0;
     if (static_cast<uint32_t>(bufferInfo.usage) & static_cast<uint32_t>(vk::BufferUsageFlagBits::eShaderDeviceAddress)) {
@@ -60,43 +63,31 @@ GpuBufferHandle ResourcesManager::createBuffer(std::string name, vk::BufferCreat
         address = _vkDevice.getBufferAddress(addressInfo);
     }
 
-    _buffers.add(handle);
-    _buffers.set(handle, BufferHandle { buffer });
-    _buffers.set(handle, BufferAddress { address });
-    _buffers.set(handle, BufferMapped { allocationInfo.pMappedData });
-    _buffers.set(handle, BufferOffset { allocationInfo.offset });
-    _buffers.set(handle, BufferSize { allocationInfo.size });
-    _buffers.set(handle, BufferMemory { allocationInfo.deviceMemory });
-    _buffers.set(handle, BufferAllocation { allocation });
-
-    _GpuBufferHandleRegistry.insert({ name, handle });
-    _invGpuBufferHandleRegistry.insert({ handle, name });
+    _resourcesRegistry.buffers.add(handle.index);
+    _resourcesRegistry.buffers.set(handle.index, BufferGpuHandle { buffer });
+    _resourcesRegistry.buffers.set(handle.index, BufferAddress { address });
+    _resourcesRegistry.buffers.set(handle.index, BufferMapped { allocationInfo.pMappedData });
+    _resourcesRegistry.buffers.set(handle.index, BufferOffset { allocationInfo.offset });
+    _resourcesRegistry.buffers.set(handle.index, BufferSize { allocationInfo.size });
+    _resourcesRegistry.buffers.set(handle.index, BufferMemory { allocationInfo.deviceMemory });
+    _resourcesRegistry.buffers.set(handle.index, BufferAllocation { allocation });
 
     return handle;
 }
 
-void ResourcesManager::destroyBuffer(GpuBufferHandle handle)
+void GpuResourcesManager::destroyBuffer(BufferHandle handle)
 {
-    assert(_buffers.has(handle));
-    _deletedBuffers.push_back(std::make_pair(_buffers.get<BufferHandle>(handle), _buffers.get<BufferAllocation>(handle)));
-    _buffers.remove(handle);
+    assert(_bufferHandleRegistry.valid(handle));
 
-    auto name = _invGpuBufferHandleRegistry[handle];
-    _GpuBufferHandleRegistry.erase(name);
-    _invGpuBufferHandleRegistry.erase(handle);
-}
+    _deletedBuffers.push_back(std::make_pair(_resourcesRegistry.buffers.get<BufferGpuHandle>(handle.index), _resourcesRegistry.buffers.get<BufferAllocation>(handle.index)));
+    _resourcesRegistry.buffers.remove(handle.index);
 
-void ResourcesManager::destroyBuffer(std::string name)
-{
-    assert(_GpuBufferHandleRegistry.find(name) != _GpuBufferHandleRegistry.end());
-    destroyBuffer(_GpuBufferHandleRegistry[name]);
+    _bufferHandleRegistry.free(handle);
 }
 
 [[nodiscard]]
-PipelineLayoutHandle ResourcesManager::createPipelineLayout(std::string name, PipelineLayoutInfo& info)
+PipelineLayoutHandle GpuResourcesManager::createPipelineLayout(PipelineLayoutInfo& info)
 {
-    assert(_PipelineLayoutHandleRegistry.find(name) == _PipelineLayoutHandleRegistry.end());
-
     vk::PipelineLayoutCreateInfo createInfo {};
     createInfo.setSetLayoutCount(static_cast<uint32_t>(info.descriptorSetLayouts.size()))
         .setPSetLayouts(info.descriptorSetLayouts.data())
@@ -105,31 +96,21 @@ PipelineLayoutHandle ResourcesManager::createPipelineLayout(std::string name, Pi
 
     vk::PipelineLayout layout = _vkDevice.createPipelineLayout(createInfo);
 
-    PipelineHandle handle = _PipelineLayoutHandleCount;
-    _PipelineLayoutHandleCount++;
+    PipelineLayoutHandle handle = _pipelineLayoutHandleRegistry.allocate();
 
-    _piplineLayouts.add(handle, layout);
-    _PipelineLayoutHandleRegistry.insert({ name, handle });
-    _invPipelineLayoutHandleRegistry.insert({ handle, name });
+    _resourcesRegistry.pipelineLayouts.add(handle.index, layout);
+
     return handle;
 }
 
-void ResourcesManager::destroyPipelineLayout(PipelineLayoutHandle handle)
+void GpuResourcesManager::destroyPipelineLayout(PipelineLayoutHandle handle)
 {
-    assert(_piplineLayouts.has(handle));
+    assert(_pipelineLayoutHandleRegistry.valid(handle));
 
-    _deletedPipelineLayouts.push_back(*_piplineLayouts.get(handle));
-    _piplineLayouts.remove(handle);
+    _deletedPipelineLayouts.push_back(*_resourcesRegistry.pipelineLayouts.get(handle.index));
+    _resourcesRegistry.pipelineLayouts.remove(handle.index);
 
-    auto name = _invPipelineLayoutHandleRegistry[handle];
-    _PipelineLayoutHandleRegistry.erase(name);
-    _invPipelineLayoutHandleRegistry.erase(handle);
-}
-
-void ResourcesManager::destroyPipelineLayout(std::string name)
-{
-    assert(_PipelineLayoutHandleRegistry.find(name) != _PipelineLayoutHandleRegistry.end());
-    destroyPipelineLayout(_PipelineLayoutHandleRegistry[name]);
+    _pipelineLayoutHandleRegistry.free(handle);
 }
 
 }

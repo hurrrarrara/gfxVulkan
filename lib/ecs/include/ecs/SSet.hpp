@@ -9,13 +9,13 @@ namespace ecs {
 template <Component T>
 struct SSet {
     std::vector<T> dense;
-    std::vector<Entity> entities;
-    std::vector<Entity> sparse;
+    std::vector<uint32_t> entities;
+    std::vector<uint32_t> sparse;
 
-    void add(Entity e, T component)
+    void add(uint32_t e, T component)
     {
         if (sparse.size() <= e)
-            sparse.resize(e + 1, INVALID_ENTITY);
+            sparse.resize(e + 1, 0xffffffff);
         if (has(e))
             return;
         sparse[e] = dense.size();
@@ -23,7 +23,7 @@ struct SSet {
         entities.push_back(e);
     }
 
-    void add(Entity e, T component, uint32_t index)
+    void add(uint32_t e, T component, uint32_t index)
     {
         add(e, component);
         swap(index, dense.size() - 1);
@@ -35,7 +35,7 @@ struct SSet {
             return;
 
         T tempComponent = dense[indexA];
-        Entity tempEntity = entities[indexA];
+        uint32_t tempEntity = entities[indexA];
 
         dense[indexA] = dense[indexB];
         entities[indexA] = entities[indexB];
@@ -46,7 +46,7 @@ struct SSet {
         sparse[entities[indexA]] = indexA;
     }
 
-    void remove(Entity e)
+    void remove(uint32_t e)
     {
         if (!has(e))
             return;
@@ -60,15 +60,15 @@ struct SSet {
 
         dense.pop_back();
         entities.pop_back();
-        sparse[e] = INVALID_ENTITY;
+        sparse[e] = 0xffffffff;
     }
 
-    [[nodiscard]] bool has(Entity e)
+    [[nodiscard]] bool has(uint32_t e)
     {
-        return (e < sparse.size() && sparse[e] != INVALID_ENTITY);
+        return (e < sparse.size() && sparse[e] != 0xffffffff);
     }
 
-    [[nodiscard]] T* get(Entity e)
+    [[nodiscard]] T* get(uint32_t e)
     {
         if (!has(e))
             return nullptr;

@@ -2,59 +2,52 @@
 
 #include <gfx_vulkan/details/prerequisites.h>
 #include <gfx_vulkan/Device.h>
+#include <gfx_vulkan/GpuDescriptorRegistry.h>
 #include <ecs/SSet.hpp>
-#include <queue>
 #include <unordered_map>
 
-#ifndef GFX_MAX_UNIFORM_BUFFER_DESCRIPTOR_COUNT
-#define GFX_MAX_UNIFORM_BUFFER_DESCRIPTOR_COUNT 1000
-#endif
-#ifndef GFX_MAX_STORAGE_BUFFER_DESCRIPTOR_COUNT
-#define GFX_MAX_STORAGE_BUFFER_DESCRIPTOR_COUNT 1000
-#endif
-#ifndef GFX_MAX_SAMPLER_DESCRIPTOR_COUNT
-#define GFX_MAX_SAMPLER_DESCRIPTOR_COUNT 100
-#endif
-#ifndef GFX_MAX_SAMPLED_IMAGE_DESCRIPTOR_COUNT
-#define GFX_MAX_SAMPLED_IMAGE_DESCRIPTOR_COUNT 1000
-#endif
-#ifndef GFX_MAX_STORAGE_IMAGE_DESCRIPTOR_COUNT
-#define GFX_MAX_STORAGE_IMAGE_DESCRIPTOR_COUNT 1000
-#endif
-
 namespace gfx {
-/* clang-format off */
-struct UniformBufferDescriptorHandle {uint32_t value;};
-struct StorageBufferDescriptorHandle {uint32_t value;};
-struct SamplerDescriptorHandle {uint32_t value;};
-struct SampledImageDescriptorHandle {uint32_t value;};
-struct StorageImageDescriptorHandle {uint32_t value;};
-/* clang-format on */
 
-class DescriptorsManager {
+class GpuDescriptorsManager {
 public:
-    DescriptorsManager(Device& device);
+    GpuDescriptorsManager(Device& device, GpuDescriptorRegistry& descriptorsRegistry);
+    ~GpuDescriptorsManager();
 
     [[nodiscard]]
-    UniformBufferDescriptorHandle createUniformBufferDescriptor(vk::Buffer buffer);
-    void freeUniformBufferDescriptor(UniformBufferDescriptorHandle handle);
+    UniformBufferDescriptor createUniformBufferDescriptor(vk::Buffer buffer);
+
+    template <ecs::Entity E>
+    void free(E handle)
+    {
+        if constexpr (std::same_as<E, UniformBufferDescriptor>) {
+            _descriptorsRegistry.uniformBuffers.free(handle);
+        } else if constexpr (std::same_as<E, StorageBufferDescriptor>) {
+            _descriptorsRegistry.storageBuffers.free(handle);
+        } else if constexpr (std::same_as<E, SamplerDescriptor>) {
+            _descriptorsRegistry.samplers.free(handle);
+        } else if constexpr (std::same_as<E, SampledImageDescriptor>) {
+            _descriptorsRegistry.sampledImages.free(handle);
+        } else if constexpr (std::same_as<E, StorageImageDescriptor>) {
+            _descriptorsRegistry.storageImages.free(handle);
+        } else {
+            static_assert(false, "GpuDescriptorsManager::free, invalid type used");
+        }
+    }
 
 private:
     vk::Device _vkDevice;
+    GpuDescriptorRegistry& _descriptorsRegistry;
     vk::DescriptorSetLayout _descriptorLayout = nullptr;
     vk::DescriptorPool _descriptorPool = nullptr;
     vk::DescriptorSet _descriptorSet = nullptr;
 
     std::unordered_map<vk::DescriptorType, std::pair<uint32_t, uint32_t>> _typesMap {
-        { vk::DescriptorType::eUniformBuffer, { 0, GFX_MAX_UNIFORM_BUFFER_DESCRIPTOR_COUNT } },
-        { vk::DescriptorType::eStorageBuffer, { 1, GFX_MAX_STORAGE_BUFFER_DESCRIPTOR_COUNT } },
-        { vk::DescriptorType::eSampler, { 2, GFX_MAX_SAMPLER_DESCRIPTOR_COUNT } },
-        { vk::DescriptorType::eSampledImage, { 3, GFX_MAX_SAMPLED_IMAGE_DESCRIPTOR_COUNT } },
-        { vk::DescriptorType::eStorageImage, { 4, GFX_MAX_STORAGE_IMAGE_DESCRIPTOR_COUNT } },
+        { vk::DescriptorType::eUniformBuffer, { GFX_UNIFORM_BUFFER_BINDING, GFX_MAX_UNIFORM_BUFFER_DESCRIPTOR_COUNT } },
+        { vk::DescriptorType::eStorageBuffer, { GFX_STORAGE_BUFFER_BINDING, GFX_MAX_STORAGE_BUFFER_DESCRIPTOR_COUNT } },
+        { vk::DescriptorType::eSampler, { GFX_SAMPLER_BINDING, GFX_MAX_SAMPLER_DESCRIPTOR_COUNT } },
+        { vk::DescriptorType::eSampledImage, { GFX_SAMPLED_IMAGE_BINDING, GFX_MAX_SAMPLED_IMAGE_DESCRIPTOR_COUNT } },
+        { vk::DescriptorType::eStorageImage, { GFX_STORAGE_IMAGE_BINDING, GFX_MAX_STORAGE_IMAGE_DESCRIPTOR_COUNT } },
     };
-
-    ecs::SSet<UniformBufferDescriptorHandle> _uniformBufferHandles;
-    std::queue<UniformBufferDescriptorHandle> _availableUniformDescriptorHandles;
 };
 
 }

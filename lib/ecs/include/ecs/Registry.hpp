@@ -5,12 +5,6 @@
 
 namespace ecs {
 
-/*
- * Hold SSet, one per component
- * need a way to map component to a UID to ordonnate between SSet
- *
- *
- */
 template <Component... Components>
 class Registry {
 public:
@@ -18,16 +12,10 @@ public:
     [[nodiscard]] SSet<T>& get() { return std::get<SSet<T>>(_sets); }
 
     template <Component T>
-    void add(Entity e, T component)
+    void add(uint32_t e, T component)
     {
         std::get<SSet<T>>(_sets).add(e, component);
     }
-
-    [[nodiscard]] Entity newEntity()
-    {
-        _entitiesCount += 1;
-        return _entitiesCount - 1;
-    };
 
     template <Component... Owned>
     [[nodiscard]] OwnsGroup<Owned...> createOwnsGroup()
@@ -37,8 +25,6 @@ public:
 
 private:
     std::tuple<SSet<Components>...> _sets;
-
-    uint32_t _entitiesCount = 0;
 };
 
 }

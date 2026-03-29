@@ -103,6 +103,7 @@ set(EXAMPLES_SOURCES
 	${EXAMPLES_DIR}/ex_device_creation.cpp
 	# ${EXAMPLES_DIR}/ex_archetypes.cpp
 	${EXAMPLES_DIR}/ex_resources_manager.cpp
+	${EXAMPLES_DIR}/descriptors.cpp
 
 )
 foreach(SOURCE ${EXAMPLES_SOURCES})

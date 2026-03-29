@@ -12,7 +12,7 @@ public:
     OwnsGroup(SSet<Owned>&... s)
         : _sets(&s...) { };
 
-    void tryAdd(Entity e)
+    void tryAdd(uint32_t e)
     {
         bool allPresent = (std::get<SSet<Owned>*>(_sets)->has(e) && ...);
         if (!allPresent) {
@@ -30,7 +30,7 @@ public:
         ++_size;
     };
 
-    void tryRemove(Entity e)
+    void tryRemove(uint32_t e)
     {
         bool allPresent = (std::get<SSet<Owned>*>(_sets)->has(e) && ...);
         if (!allPresent) {
