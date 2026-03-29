@@ -50,6 +50,8 @@ GpuDescriptorsManager::GpuDescriptorsManager(Device& device, GpuDescriptorRegist
 
 GpuDescriptorsManager::~GpuDescriptorsManager()
 {
+    _vkDevice.destroyDescriptorPool(_descriptorPool);
+    _vkDevice.destroyDescriptorSetLayout(_descriptorLayout);
 }
 
 [[nodiscard]]
