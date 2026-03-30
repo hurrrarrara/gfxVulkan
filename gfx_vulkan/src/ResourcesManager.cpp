@@ -107,7 +107,7 @@ void GpuResourcesManager::destroyPipelineLayout(PipelineLayoutHandle handle)
 {
     assert(_pipelineLayoutHandleRegistry.valid(handle));
 
-    _deletedPipelineLayouts.push_back(*_resourcesRegistry.pipelineLayouts.get(handle.index));
+    _deletedPipelineLayouts.push_back(_resourcesRegistry.pipelineLayouts.get(handle.index));
     _resourcesRegistry.pipelineLayouts.remove(handle.index);
 
     _pipelineLayoutHandleRegistry.free(handle);

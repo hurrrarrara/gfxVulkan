@@ -24,6 +24,20 @@ struct BufferHandle {
     inline bool operator==(const BufferHandle& c) const { return this->index == c.index && this->generation == c.generation; };
 };
 
+struct ImageHandle {
+    uint32_t index : 24 = 0xFFFFFF;
+    uint32_t generation : 8 = 0;
+    inline static constexpr BufferHandle invalid() { return {}; }
+    inline bool operator==(const BufferHandle& c) const { return this->index == c.index && this->generation == c.generation; };
+};
+
+struct ImageViewHandle {
+    uint32_t index : 24 = 0xFFFFFF;
+    uint32_t generation : 8 = 0;
+    inline static constexpr BufferHandle invalid() { return {}; }
+    inline bool operator==(const BufferHandle& c) const { return this->index == c.index && this->generation == c.generation; };
+};
+
 struct PipelineLayoutHandle {
     uint32_t index : 24 = 0xFFFFFF;
     uint32_t generation : 8 = 0;

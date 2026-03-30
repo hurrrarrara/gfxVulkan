@@ -68,11 +68,11 @@ struct SSet {
         return (e < sparse.size() && sparse[e] != 0xffffffff);
     }
 
-    [[nodiscard]] T* get(uint32_t e)
+    [[nodiscard]] T& get(uint32_t e)
     {
         if (!has(e))
             return nullptr;
-        return &dense[sparse[e]];
+        return dense[sparse[e]];
     }
 };
 
