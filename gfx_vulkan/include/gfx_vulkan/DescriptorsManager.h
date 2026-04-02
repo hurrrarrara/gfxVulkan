@@ -38,7 +38,7 @@ public:
         } else if constexpr (std::same_as<E, StorageImageDescriptor>) {
             _descriptorsRegistry.storageImages.free(handle);
         } else {
-            static_assert(false, "GpuDescriptorsManager::free, invalid type used");
+            static_assert(!sizeof(E*), "GpuDescriptorsManager::free, invalid type used");
         }
     }
 

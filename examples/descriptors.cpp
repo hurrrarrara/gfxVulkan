@@ -24,5 +24,8 @@ int main()
 
     gpuDescriptorManager.free(des);
 
+	// gfx::BufferHandle b;
+	// gpuDescriptorManager.free(b);
+
     gpuResourcesManager.flush();
 }

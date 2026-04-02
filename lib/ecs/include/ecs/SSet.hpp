@@ -70,8 +70,9 @@ struct SSet {
 
     [[nodiscard]] T& get(uint32_t e)
     {
-        if (!has(e))
-            return nullptr;
+		assert(has(e));
+        // if (!has(e))
+        //     return nullptr;
         return dense[sparse[e]];
     }
 };

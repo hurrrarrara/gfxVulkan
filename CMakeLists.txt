@@ -99,10 +99,10 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
 set(EXAMPLES_DIR ${CMAKE_SOURCE_DIR}/examples)
 set(EXAMPLES_SOURCES
-	${EXAMPLES_DIR}/ex_window_creation.cpp
-	${EXAMPLES_DIR}/ex_device_creation.cpp
+	# ${EXAMPLES_DIR}/ex_window_creation.cpp
+	# ${EXAMPLES_DIR}/ex_device_creation.cpp
 	# ${EXAMPLES_DIR}/ex_archetypes.cpp
-	${EXAMPLES_DIR}/ex_resources_manager.cpp
+	# ${EXAMPLES_DIR}/ex_resources_manager.cpp
 	${EXAMPLES_DIR}/descriptors.cpp
 
 )
