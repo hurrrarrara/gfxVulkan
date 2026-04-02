@@ -45,7 +45,7 @@ struct UniformBufferDescriptor {
 
 struct StorageBufferDescriptor {
     uint32_t index : 16 = 0xffff;
-    uint32_t generation : 12 = 0;
+    uint32_t generation : 16 = 0;
     inline static constexpr uint32_t binding() { return GFX_STORAGE_BUFFER_BINDING; }
     inline static constexpr StorageBufferDescriptor invalid() { return {}; }
     inline bool operator==(const StorageBufferDescriptor& c) const { return this->index == c.index && this->generation == c.generation; };

@@ -9,16 +9,16 @@ namespace gfx {
 
 /* clang-format off */
 struct PipelineInfo {
- 	std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
-    VkPipelineVertexInputStateCreateInfo        vertexInput{};
-    VkPipelineInputAssemblyStateCreateInfo      inputAssembly{};
-    VkPipelineRasterizationStateCreateInfo      rasterizer{};
-    VkPipelineMultisampleStateCreateInfo        multisampling{};
-    VkPipelineDepthStencilStateCreateInfo       depthStencil{};
-    VkPipelineColorBlendAttachmentState         colorBlendAttachment{};
-    VkPipelineRenderingCreateInfo               renderingInfo{};
-	vk::PipelineDynamicStateCreateInfo          dynamicStateInfo{};
-	vk::PipelineViewportStateCreateInfo			viewportInfo{};
+ 	std::vector<vk::PipelineShaderStageCreateInfo>	shaderStages;
+	vk::PipelineVertexInputStateCreateInfo			vertexInput{};
+	vk::PipelineInputAssemblyStateCreateInfo 		inputAssembly{};
+	vk::PipelineRasterizationLineStateCreateInfo	rasterizer{};
+	vk::PipelineMultisampleStateCreateInfo			multisampling{};
+	vk::PipelineDepthStencilStateCreateInfo			depthStencil{};
+	vk::PipelineColorBlendAttachmentState			colorBlendAttachment{};
+	vk::PipelineDynamicStateCreateInfo         		dynamicStateInfo{};
+	vk::PipelineViewportStateCreateInfo				viewportInfo{};
+	vk::PipelineRenderingCreateInfo					renderingInfo{};
 };
 
 struct PipelineLayoutInfo {
